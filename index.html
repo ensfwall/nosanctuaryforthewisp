@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+	<title>No Sanctuary For the Wisp</title>
+	<!-- iOS & PWA Standalone Fullscreen Meta Tags -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-touch-fullscreen" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+	<meta name="apple-mobile-web-app-title" content="Wisp Harvest">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="theme-color" content="#0c1314">
+	<link rel="manifest" href="manifest.json">
+	<link rel="apple-touch-icon" href="apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+	<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+	<link rel="icon" type="image/svg+xml" href="icon.svg">
+	<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+		* {
+			box-sizing: border-box;
+			user-select: none;
+			-webkit-user-select: none;
+			margin: 0;
+			padding: 0
+		}
+
+		body {
+			background: #0c1314;
+			height: 100vh;
+			height: 100dvh;
+			overflow: hidden;
+			font-family: system-ui, sans-serif;
+			display: flex;
+			flex-direction: column;
+			touch-action: none;
+			padding-top: env(safe-area-inset-top);
+			padding-bottom: env(safe-area-inset-bottom);
+		}
+
+		#game-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			padding: 12px;
+			max-width: 480px;
+			margin: 0 auto;
+			width: 100%;
+			height: 100%
+		}
+
+		#canvas-wrapper {
+			position: relative;
+			flex: 0 0 54%;
+			width: calc(100% + 24px);
+			margin: -12px -12px 6px -12px;
+			background: #06100e;
+			border-radius: 0 0 28px 28px;
+			box-shadow: 0 12px 28px rgba(0, 0, 0, .5);
+			overflow: hidden
+		}
+
+		#snake-canvas {
+			width: 100%;
+			height: 100%;
+			display: block
+		}
+
+		.joy-hint {
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			max-width: 255px;
+			font-size: 8px;
+			line-height: 1.38;
+			color: rgba(255, 255, 255, .92);
+			font-weight: 700;
+			font-family: monospace;
+			text-align: left;
+			z-index: 20;
+			background: rgba(6, 16, 14, .88);
+			padding: 5px 8px;
+			border-radius: 10px;
+			border: 1px solid rgba(255, 255, 255, .25);
+			box-shadow: 0 4px 14px rgba(0, 0, 0, .6);
+			pointer-events: auto;
+			cursor: pointer;
+			-webkit-tap-highlight-color: transparent;
+			transition: all .18s ease
+		}
+
+		.joy-hint .hint-head {
+			color: #ffffff;
+			letter-spacing: 0.5px;
+			margin-bottom: 2px
+		}
+
+		.joy-hint .hint-min {
+			display: none;
+			font-size: 9.5px;
+			color: #ffffff;
+			letter-spacing: 0.8px;
+			font-weight: 800;
+			white-space: nowrap
+		}
+
+		.joy-hint.minimized {
+			padding: 4px 10px;
+			border-radius: 99px;
+			background: rgba(6, 16, 14, .82);
+			border-color: rgba(255, 255, 255, .35)
+		}
+
+		.joy-hint.minimized .hint-min {
+			display: block
+		}
+
+		.joy-hint.minimized .hint-full {
+			display: none
+		}
+
+		.canvas-actions {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			display: flex;
+			gap: 6px;
+			z-index: 20;
+			pointer-events: auto
+		}
+
+		#hud-container {
+			width: 100%;
+			padding: 4px 2px;
+			margin-bottom: 6px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			pointer-events: none;
+			z-index: 10
+		}
+
+		.pill {
+			background: #0c1814;
+			border: 1px solid rgba(255, 255, 255, .25);
+			border-radius: 99px;
+			padding: 3px 8px;
+			display: flex;
+			align-items: center;
+			gap: 5px
+		}
+
+		.dot {
+			width: 7px;
+			height: 7px;
+			border-radius: 50%;
+			background: #ffffff;
+			transition: background .3s
+		}
+
+		.title {
+			font-size: 9.5px;
+			font-weight: 700;
+			color: #ffffff;
+			font-family: monospace;
+			letter-spacing: 0.5px
+		}
+
+		.stat-pill {
+			background: #0c1814;
+			border: 1px solid rgba(255, 255, 255, .25);
+			border-radius: 99px;
+			padding: 3px 8px;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			font-size: 9.5px;
+			font-family: monospace;
+			color: #f0fdf4
+		}
+
+		.stat-val {
+			color: #e2e8f0;
+			font-weight: bold
+		}
+
+		.stat-hp {
+			color: #ffffff;
+			letter-spacing: 1px
+		}
+
+		.btn {
+			background: rgba(6, 16, 14, .75);
+			border: 1px solid rgba(255, 255, 255, .3);
+			border-radius: 50%;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 30px;
+			height: 30px;
+			pointer-events: auto;
+			color: #ffffff;
+			font-size: 12px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, .5)
+		}
+
+		.btn:active {
+			transform: scale(.9)
+		}
+
+		.btn-play {
+			background: rgba(255, 255, 255, .15);
+			border: 1.5px solid #ffffff;
+			color: #ffffff;
+			font-size: 11px;
+			box-shadow: 0 0 10px rgba(255, 255, 255, .3)
+		}
+
+		.btn-play.playing {
+			background: rgba(255, 255, 255, .2);
+			border-color: #ffffff;
+			color: #ffffff;
+			box-shadow: none
+		}
+
+		#controls-wrapper {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			position: relative;
+			border-radius: 24px;
+			background: linear-gradient(145deg, #13221e, #0a1614);
+			border: 1px solid rgba(255, 255, 255, .1);
+			box-shadow: inset 2px 2px 5px rgba(0, 0, 0, .5), inset -2px -2px 5px rgba(255, 255, 255, .03);
+			overflow: hidden
+		}
+
+		.joy-ghost-eyes {
+			position: absolute;
+			left: 35px;
+			bottom: 30px;
+			display: flex;
+			gap: 15px;
+			z-index: 1;
+			pointer-events: none;
+			transform: rotate(8deg);
+			opacity: 1
+		}
+
+		.joy-wmark-eye {
+			width: 28px;
+			height: 60px;
+			background: #ffffff;
+			border-radius: 14px 14px 0 0;
+			transform-origin: bottom;
+			animation: ghostBlink 3.8s infinite ease-in-out;
+			box-shadow: 0 0 18px rgba(255, 255, 255, .35)
+		}
+
+		#joystick-area {
+			position: absolute;
+			inset: 0;
+			touch-action: none;
+			z-index: 2
+		}
+
+		.joy-base {
+			position: absolute;
+			width: 82px;
+			height: 82px;
+			background: radial-gradient(circle, rgba(255, 255, 255, .16), rgba(255, 255, 255, .03));
+			border-radius: 50%;
+			border: 1.5px solid rgba(255, 255, 255, .25);
+			box-shadow: 0 0 16px rgba(255, 255, 255, .1);
+			display: none;
+			pointer-events: none;
+			transform: translate(-50%, -50%)
+		}
+
+		.joy-stick {
+			position: absolute;
+			width: 32px;
+			height: 40px;
+			background: linear-gradient(180deg, rgba(255, 255, 255, .92), rgba(203, 213, 225, .65));
+			border-radius: 15px 15px 7px 7px;
+			border: 1px solid rgba(255, 255, 255, .7);
+			box-shadow: 0 0 12px rgba(255, 255, 255, .4);
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+			overflow: hidden
+		}
+
+		.stick-eyes {
+			position: absolute;
+			top: 9px;
+			left: 53%;
+			transform: translateX(-50%) rotate(7deg);
+			display: flex;
+			gap: 3px;
+			pointer-events: none
+		}
+
+		.stick-eye {
+			width: 3.6px;
+			height: 7.2px;
+			background: #06100e;
+			border-radius: 2px 2px 0 0;
+			transform-origin: bottom;
+			animation: ghostBlink 3.8s infinite ease-in-out
+		}
+
+		.game-footer-name {
+			position: absolute;
+			top: 18px;
+			right: 20px;
+			text-align: right;
+			font-size: 9px;
+			line-height: 1.45;
+			font-family: 'Press Start 2P', monospace;
+			letter-spacing: .5px;
+			color: #ffffff;
+			text-shadow: 0 0 10px rgba(255, 255, 255, .4), 0 2px 5px rgba(0, 0, 0, .9);
+			text-transform: uppercase;
+			pointer-events: none;
+			z-index: 5
+		}
+
+		@keyframes ghostBlink {
+
+			0%,
+			92%,
+			100% {
+				transform: scaleY(1)
+			}
+
+			95%,
+			97% {
+				transform: scaleY(.12)
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div id="game-container">
+		<div id="canvas-wrapper">
+			<canvas id="snake-canvas"></canvas>
+			<div class="joy-hint" id="joy-hint">
+				<div id="joy-hint-min" class="hint-min">📖 HOW TO PLAY</div>
+				<div id="joy-hint-full" class="hint-full">
+					<div class="hint-head">GROW PLANTS BY:</div>
+					<div>֍ CARRY SUN TO ENERGIZE PLANTS</div>
+					<div>o COLLECT 3 WATER TO SPRAY PLANTS</div>
+					<div>&lt;&gt; DODGE HAZARDS TO AVOID DEATH</div>
+					<div>* KEEP GROWING TO STAY ALIVE</div>
+				</div>
+			</div>
+			<div class="canvas-actions">
+				<button id="btn-play" class="btn btn-play" title="Start Harvest">▶</button>
+				<button id="btn-audio" class="btn" title="Audio">🔊</button>
+			</div>
+		</div>
+		<div id="hud-container">
+			<div class="pill">
+				<div id="hud-dot" class="dot"></div><span class="title">ASCII HARVEST</span>
+			</div>
+			<div class="stat-pill"><span id="hud-crops">🧺 0</span> <span id="hud-water" class="stat-val">💧 0/3</span>
+				<span id="hud-hp" class="stat-hp">❤❤❤</span> <span id="hud-time" class="stat-val">READY</span></div>
+		</div>
+		<div id="controls-wrapper">
+			<div class="joy-ghost-eyes">
+				<div class="joy-wmark-eye"></div>
+				<div class="joy-wmark-eye"></div>
+			</div>
+			<div id="joystick-area">
+				<div class="joy-base" id="joy-base">
+					<div class="joy-stick" id="joy-stick">
+						<div class="stick-eyes">
+							<div class="stick-eye"></div>
+							<div class="stick-eye"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="game-footer-name">No Sanctuary<br>For the Wisp</div>
+		</div>
+	</div>
+	<script>
+		const S = {
+			c: null, ctx: null, w: 0, h: 0, dpr: 1, run: !1,
+			groundCanvas: null, groundCtx: null,
+			spriteCanvas: null, spriteCtx: null,
+			head: { x: 200, y: 100, w: 22, h: 28, sz: 24, r: [12, 12, 6, 6], a: 0, ta: 0 },
+			body: { x: 178, y: 100, sz: 18, r: 5, a: 0, d: 22 },
+			tail: { x: 160, y: 100, sz: 12, r: 3, a: 0, d: 16 },
+			wig: 0, blk: { c: !1, t: 90 },
+			tgt: { x: 200, y: 100 }, lp: null, lt: 0, ten: 0,
+			pts: [], maxP: 50, pCnt: 0, hue: 120,
+			snakeTrail: [], maxSnakeTrail: 6, trailTimer: 0,
+			snd: !0, actx: null, scl: [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3, 659.3, 784.0], lStp: -1,
+			// Zero-Allocation Bullet, Sprinkler & Entity Pools
+			maxB: 40, bullets: [], bCnt: 0,
+			maxSprinklerP: 48, sprinklerPool: [], sprinklerCnt: 0,
+			plots: [], blossoms: [], maxBlossoms: 4, blossomCnt: 0,
+			// Sun Courier State
+			sunOrb: { x: 150, y: 80, r: 7, state: 'idle', pulse: 0 },
+			// Water Collection & Sprinkler State
+			waterCollected: 0, waterThreshold: 3, sprinklerTimer: 0,
+			harvestCount: 0, hp: 3, maxHp: 3, iFrames: 0, score: 0, grazeCount: 0,
+			timeElapsed: 0, lastSpawn: 0, patternIdx: 0, patternTimer: 0,
+			gameStarted: !1, gameOver: !1, shake: 0, flashRed: 0,
+			hintExpanded: !1,
+			// Cached DOM references & frame timing
+			elCr: null, elWt: null, elHp: null, elTm: null, elDot: null, elPlay: null, elHint: null,
+			_lCr: -1, _lWt: '', _lHp: -1, _lTm: '', _lDot: '',
+			lastFrameTime: 0,
+			cropTypes: [
+				{ name: 'Berry', icon: '🍓', growRate: 1.1 },
+				{ name: 'Carrot', icon: '🥕', growRate: 1.0 },
+				{ name: 'Flower', icon: '🌸', growRate: 1.2 },
+				{ name: 'Pumpkin', icon: '🎃', growRate: 0.9 }
+			],
+			updateHintUI() {
+				if (!this.elHint) this.elHint = document.getElementById('joy-hint');
+				if (!this.elHint) return;
+				if (this.gameStarted && !this.gameOver) {
+					if (this.hintExpanded) {
+						this.elHint.classList.remove('minimized');
+					} else {
+						this.elHint.classList.add('minimized');
+					}
+				} else {
+					this.elHint.classList.remove('minimized');
+				}
+			},
+			init(el) {
+				this.c = el; this.ctx = el.getContext('2d', { alpha: !1 });
+				this.groundCanvas = document.createElement('canvas');
+				this.groundCtx = this.groundCanvas.getContext('2d');
+				this.spriteCanvas = document.createElement('canvas');
+				this.spriteCanvas.width = 160; this.spriteCanvas.height = 32;
+				this.spriteCtx = this.spriteCanvas.getContext('2d');
+				this.renderSprites();
+				this.elCr = document.getElementById('hud-crops');
+				this.elWt = document.getElementById('hud-water');
+				this.elHp = document.getElementById('hud-hp');
+				this.elTm = document.getElementById('hud-time');
+				this.elDot = document.getElementById('hud-dot');
+				this.elPlay = document.getElementById('btn-play');
+				this.elHint = document.getElementById('joy-hint');
+				this.rsz();
+				// Preallocate fixed object pools for 0 GC overhead
+				for (let i = 0; i < this.maxP; i++)this.pts.push({ x: 0, y: 0, vx: 0, vy: 0, c: '#ffffff', l: 0, dc: 0, s: 0 });
+				for (let i = 0; i < this.maxB; i++)this.bullets.push({ x: 0, y: 0, vx: 0, vy: 0, r: 5.5, kind: 'water', subKind: 0, grazed: !1, active: !1 });
+				for (let i = 0; i < this.maxBlossoms; i++)this.blossoms.push({ x: 0, y: 0, r: 0, maxR: 100, alpha: 0, active: !1 });
+				for (let i = 0; i < this.maxSprinklerP; i++)this.sprinklerPool.push({ x: 0, y: 0, vx: 0, vy: 0, len: 4, life: 0, active: !1 });
+				for (let i = 0; i < this.maxSnakeTrail; i++)this.snakeTrail.push({ hx: 200, hy: 100, ha: 0, bx: 178, by: 100, ba: 0, tx: 160, ty: 100, ta: 0, wig: 0, tmp: 0, active: !1 });
+				this.reset();
+				window.addEventListener('resize', () => this.rsz());
+			},
+			renderSprites() {
+				if (!this.spriteCanvas || !this.spriteCtx) return;
+				const sc = this.spriteCtx;
+				sc.clearRect(0, 0, 160, 32);
+				sc.textBaseline = 'middle';
+				sc.textAlign = 'center';
+
+				// 1. Water Drop 'o' (Slot 0, x: 0..19, y: 0..23, center: 10, 12) - 11px
+				sc.font = 'bold 11px "Press Start 2P", monospace, monospace';
+				sc.fillStyle = '#ffffff';
+				sc.fillText('o', 10, 12);
+
+				// 2. Water Drop '0' (Slot 1, x: 20..39, y: 0..23, center: 30, 12) - 11px
+				sc.font = 'bold 11px "Press Start 2P", monospace, monospace';
+				sc.fillStyle = '#ffffff';
+				sc.fillText('0', 30, 12);
+
+				// 3. Fire Hazard '>' (Slot 2, x: 40..59, y: 0..23, center: 50, 12) - 13px
+				sc.font = 'bold 13px "Press Start 2P", monospace, monospace';
+				sc.fillStyle = '#ffffff';
+				sc.fillText('>', 50, 12);
+
+				// 4. Fire Hazard '<' (Slot 3, x: 60..79, y: 0..23, center: 70, 12) - 13px
+				sc.font = 'bold 13px "Press Start 2P", monospace, monospace';
+				sc.fillStyle = '#ffffff';
+				sc.fillText('<', 70, 12);
+
+				// 5. Sun Orb '֍' Idle (Slot 4, x: 80..119, y: 0..32, center: 100, 16) - 22px
+				sc.font = 'bold 22px system-ui, sans-serif';
+				sc.fillStyle = '#ffffff';
+				sc.fillText('֍', 100, 16);
+
+				// 6. Sun Orb '֍' Carried (Slot 5, x: 120..159, y: 0..32, center: 140, 16) - 23px
+				sc.font = 'bold 23px system-ui, sans-serif';
+				sc.fillStyle = '#ffffff';
+				sc.shadowColor = 'rgba(255,255,255,0.85)';
+				sc.shadowBlur = 6;
+				sc.fillText('֍', 140, 16);
+				sc.shadowBlur = 0;
+			},
+			getGroundY(x) {
+				const norm = x / (this.w || 1);
+				// Rolling Iwagumi aquascape hills: Left hill mound, central valley dip, right mound
+				const hill1 = Math.sin(norm * Math.PI * 2 - 0.6) * 6.0;
+				const hill2 = Math.cos(norm * Math.PI * 4) * 2.8;
+				return (this.h - 18) + hill1 + hill2;
+			},
+			renderGround() {
+				if (!this.groundCanvas) return;
+				this.groundCanvas.width = this.c.width;
+				this.groundCanvas.height = this.c.height;
+				const gc = this.groundCtx;
+				gc.save();
+				gc.scale(this.dpr, this.dpr);
+				gc.clearRect(0, 0, this.w, this.h);
+
+				// Modern Black & White ASCII Art Ground Moss (Toyoi Yuuta inspired density layering)
+				const charW = 7, charH = 8;
+				gc.textBaseline = 'top';
+				gc.textAlign = 'center';
+				gc.font = 'bold 7px "Press Start 2P", monospace, monospace';
+
+				const topChars = [',,', '..', ':;', "''", '~~', '..', ':;'];
+				const soilChars1 = ['.', ',', ':', '`', '~'];
+				const soilChars2 = [';', '+', '*', '%', '='];
+				const soilChars3 = ['#', '@', '&', '%', '#'];
+
+				for (let x = Math.floor(charW / 2); x < this.w + charW; x += charW) {
+					const baseGy = Math.round(this.getGroundY(x));
+					const microTuft = ((Math.sin(x * 0.22) * 2.5 + Math.cos(x * 0.48) * 1.5) | 0);
+					const gy = baseGy - microTuft;
+
+					// 1. Surface moss tuft peaks (Crisp White / Platinum)
+					const topIdx = Math.abs(Math.floor(x * 13)) % topChars.length;
+					gc.fillStyle = '#ffffff';
+					gc.fillText(topChars[topIdx], x, gy - 6);
+
+					// Optional crest sparkle accent
+					if (((x * 7 + 3) % 29) === 0) {
+						gc.fillStyle = '#f8fafc';
+						gc.fillText('^', x, gy - 10);
+					}
+
+					// 2. Subterranean ASCII Soil & Bedrock Layers
+					for (let y = gy; y < this.h; y += charH) {
+						const depth = (y - gy) / Math.max(1, this.h - gy);
+						if (depth < 0.3) {
+							// Upper soil (Silver Gray)
+							const ch = soilChars1[(Math.abs(Math.floor(x * 17 + y * 31))) % soilChars1.length];
+							gc.fillStyle = '#94a3b8';
+							gc.fillText(ch, x, y);
+						} else if (depth < 0.68) {
+							// Mid soil (Slate Gray)
+							const ch = soilChars2[(Math.abs(Math.floor(x * 19 + y * 23))) % soilChars2.length];
+							gc.fillStyle = '#475569';
+							gc.fillText(ch, x, y);
+						} else {
+							// Deep bedrock (Deep Charcoal)
+							const ch = soilChars3[(Math.abs(Math.floor(x * 29 + y * 37))) % soilChars3.length];
+							gc.fillStyle = '#1e293b';
+							gc.fillText(ch, x, y);
+						}
+					}
+				}
+				gc.restore();
+			},
+			initPlots() {
+				this.plots = [];
+				const count = 4;
+				const spacing = this.w / (count + 1);
+				for (let i = 0; i < count; i++) {
+					const px = Math.round(spacing * (i + 1));
+					const py = Math.round(this.getGroundY(px));
+					const type = this.cropTypes[i % this.cropTypes.length];
+					this.plots.push({
+						x: px,
+						y: py,
+						r: 16,
+						type, growth: 15, water: 30, sun: 30,
+						ripe: !1, sprinkleFlash: 0,
+						tilt: i === 0 ? 1.2 : (i === 1 ? -0.8 : (i === 2 ? 0.6 : -1.1)),
+						leafAlt: i % 2 === 0 ? 0.35 : 0.48
+					});
+				}
+			},
+			spawnSun() {
+				// Random position in sky, strictly away from bottom ground plants
+				this.sunOrb.x = Math.round(25 + Math.random() * (this.w - 50));
+				this.sunOrb.y = Math.round(35 + Math.random() * (this.h - 85));
+				this.sunOrb.state = 'idle';
+				this.sunOrb.pulse = 0;
+			},
+			startGame() {
+				this.iAud();
+				this.gameStarted = !0;
+				this.gameOver = !1;
+				this.timeElapsed = 0;
+				this.lastSpawn = Date.now();
+				this.hintExpanded = !1;
+				this.updateHintUI();
+				if (this.elPlay) {
+					this.elPlay.textContent = '🔄';
+					this.elPlay.classList.add('playing');
+					this.elPlay.title = 'Restart Harvest';
+				}
+				this.updateHud(!0);
+			},
+			reset() {
+				this.head.x = this.tgt.x = this.w / 2 || 150; this.head.y = this.tgt.y = this.h / 2 || 150;
+				this.body.x = this.head.x - this.body.d; this.body.y = this.head.y;
+				this.tail.x = this.body.x - this.tail.d; this.tail.y = this.head.y;
+				this.bCnt = 0;
+				for (let i = 0; i < this.maxB; i++)this.bullets[i].active = !1;
+				this.blossomCnt = 0;
+				for (let i = 0; i < this.maxBlossoms; i++)this.blossoms[i].active = !1;
+				this.sprinklerCnt = 0;
+				for (let i = 0; i < this.maxSprinklerP; i++)this.sprinklerPool[i].active = !1;
+				for (let i = 0; i < this.maxSnakeTrail; i++)this.snakeTrail[i].active = !1;
+				this.waterCollected = 0; this.sprinklerTimer = 0;
+				this.hp = this.maxHp; this.iFrames = 0; this.score = 0; this.grazeCount = 0; this.harvestCount = 0;
+				this.timeElapsed = 0; this.lastSpawn = 0; this.patternIdx = 0; this.patternTimer = 0;
+				this.gameStarted = !1;
+				this.gameOver = !1; this.shake = 0; this.flashRed = 0;
+				this.hintExpanded = !1;
+				this.updateHintUI();
+				if (this.elPlay) {
+					this.elPlay.textContent = '▶';
+					this.elPlay.classList.remove('playing');
+					this.elPlay.title = 'Start Harvest';
+				}
+				this.initPlots();
+				this.spawnSun();
+				this.updateHud(!0);
+			},
+			rsz() {
+				if (!this.c) return;
+				const r = this.c.parentElement.getBoundingClientRect();
+				this.w = Math.max(1, Math.round(r.width)); this.h = Math.max(1, Math.round(r.height));
+				this.dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+				this.c.width = Math.floor(this.w * this.dpr); this.c.height = Math.floor(this.h * this.dpr);
+				this.ctx.scale(this.dpr, this.dpr);
+				this.initPlots();
+				this.renderGround();
+				if (this.sunOrb.state === 'idle') this.spawnSun();
+			},
+			iAud() {
+				if (!this.actx) this.actx = new (window.AudioContext || window.webkitAudioContext)();
+				if (this.actx.state === 'suspended') this.actx.resume();
+			},
+			sfx(type) {
+				if (!this.snd || !this.actx) return;
+				const nw = this.actx.currentTime;
+				try {
+					const osc = this.actx.createOscillator(), g = this.actx.createGain();
+					if (type === 'hit') {
+						osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, nw); osc.frequency.exponentialRampToValueAtTime(30, nw + .22);
+						g.gain.setValueAtTime(.2, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .22);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .24);
+					} else if (type === 'water' || type === 'sun') {
+						osc.type = 'sine'; osc.frequency.setValueAtTime(type === 'water' ? 620 : 740, nw); osc.frequency.exponentialRampToValueAtTime(type === 'water' ? 880 : 980, nw + .07);
+						g.gain.setValueAtTime(.04, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .07);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .08);
+					} else if (type === 'sunAttach') {
+						osc.type = 'triangle'; osc.frequency.setValueAtTime(520, nw); osc.frequency.linearRampToValueAtTime(880, nw + .12);
+						g.gain.setValueAtTime(.07, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .14);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .15);
+					} else if (type === 'sprinklerStart') {
+						osc.type = 'sine'; osc.frequency.setValueAtTime(440, nw); osc.frequency.linearRampToValueAtTime(780, nw + .15);
+						g.gain.setValueAtTime(.08, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .2);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .22);
+					} else if (type === 'harvest') {
+						const notes = [523.25, 659.25, 783.99, 1046.50];
+						notes.forEach((freq, idx) => {
+							const o = this.actx.createOscillator(), gn = this.actx.createGain();
+							o.type = 'sine'; o.frequency.setValueAtTime(freq, nw + idx * 0.05);
+							gn.gain.setValueAtTime(.07, nw + idx * 0.05); gn.gain.exponentialRampToValueAtTime(.0001, nw + idx * 0.05 + .3);
+							o.connect(gn); gn.connect(this.actx.destination); o.start(nw + idx * 0.05); o.stop(nw + idx * 0.05 + .32);
+						});
+					} else if (type === 'graze') {
+						osc.type = 'sine'; osc.frequency.setValueAtTime(880, nw); osc.frequency.exponentialRampToValueAtTime(1320, nw + .05);
+						g.gain.setValueAtTime(.04, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .05);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .06);
+					}
+				} catch (e) { }
+			},
+			tone(y, spd) {
+				if (!this.snd || !this.actx) return;
+				const nw = this.actx.currentTime, st = Math.floor(nw / .16);
+				if (st === this.lStp) return; this.lStp = st;
+				try {
+					const idx = Math.floor((1 - Math.min(Math.max(y / (this.h || 1), 0), 1)) * this.scl.length);
+					const osc = this.actx.createOscillator(), g = this.actx.createGain();
+					osc.type = 'triangle';
+					osc.frequency.setValueAtTime(this.scl[Math.min(idx, this.scl.length - 1)], nw);
+					const dur = Math.max(.2, .5 - spd * .015), vol = Math.min(.08, .02 + spd * .005);
+					g.gain.setValueAtTime(.001, nw); g.gain.linearRampToValueAtTime(vol, nw + .012);
+					g.gain.exponentialRampToValueAtTime(.0001, nw + dur);
+					osc.connect(g); g.connect(this.actx.destination);
+					osc.start(nw); osc.stop(nw + dur + .02);
+				} catch (e) { }
+			},
+			spawnP(x, y, spd, vx, vy, customHue) {
+				const cnt = Math.min(2, Math.max(1, Math.floor(spd * .2)));
+				for (let i = 0; i < cnt; i++) {
+					let p = this.pCnt < this.maxP ? this.pts[this.pCnt++] : this.pts[0];
+					if (this.pCnt >= this.maxP) { for (let k = 0; k < this.maxP - 1; k++)this.pts[k] = this.pts[k + 1]; this.pts[this.maxP - 1] = p; }
+					const a = Math.random() * Math.PI * 2, r = Math.random() * 6, s = .5 + Math.random() * 1.2;
+					p.x = x + Math.cos(a) * r; p.y = y + Math.sin(a) * r;
+					p.vx = Math.cos(a) * s + (vx || 0) * .06; p.vy = Math.sin(a) * s + (vy || 0) * .06;
+					p.c = customHue === 0 ? '#f43f5e' : (customHue === 195 ? '#ffffff' : (customHue === 130 ? '#f8fafc' : (customHue === 45 ? '#ffffff' : '#cbd5e1')));
+					p.s = 2 + Math.random() * 1.5; p.l = 1; p.dc = .025 + Math.random() * .02;
+				}
+			},
+			fol(s, t, d) {
+				const dx = t.x - s.x, dy = t.y - s.y; s.a = Math.atan2(dy, dx);
+				s.x = t.x - Math.cos(s.a) * d; s.y = t.y - Math.sin(s.a) * d;
+			},
+			updateHud(force) {
+				if (this.elCr && (force || this._lCr !== this.harvestCount)) {
+					this._lCr = this.harvestCount;
+					this.elCr.textContent = `🧺 ${this.harvestCount}`;
+				}
+				const wtStr = this.sprinklerTimer > 0 ? '🚿 SPRAY!' : `💧 ${this.waterCollected}/${this.waterThreshold}`;
+				if (this.elWt && (force || this._lWt !== wtStr)) {
+					this._lWt = wtStr;
+					this.elWt.textContent = wtStr;
+				}
+				if (this.elHp && (force || this._lHp !== this.hp)) {
+					this._lHp = this.hp;
+					this.elHp.textContent = '❤'.repeat(Math.max(0, this.hp)) + '🖤'.repeat(Math.max(0, this.maxHp - this.hp));
+				}
+				const tmStr = this.gameStarted ? `${this.timeElapsed.toFixed(1)}s` : 'READY';
+				if (this.elTm && (force || this._lTm !== tmStr)) {
+					this._lTm = tmStr;
+					this.elTm.textContent = tmStr;
+				}
+			},
+			spawnBullet(x, y, vx, vy, r, kind, subKind) {
+				if (this.bCnt >= this.maxB) return;
+				const b = this.bullets[this.bCnt++];
+				b.x = x; b.y = y; b.vx = vx; b.vy = vy; b.r = r; b.kind = kind; b.subKind = subKind || 0; b.grazed = !1; b.active = !0;
+			},
+			spawnWeatherAndPests(now) {
+				const intensity = 1 + Math.min(2.0, this.timeElapsed / 14);
+				this.patternTimer++;
+				if (this.patternTimer > 150) {
+					this.patternTimer = 0;
+					this.patternIdx = (this.patternIdx + 1) % 3;
+				}
+				if (now - this.lastSpawn > Math.max(180, 450 - this.timeElapsed * 11)) {
+					this.lastSpawn = now;
+					const speedBase = 1.4 + intensity * 0.42;
+					// 1. Water Rain: Spawns from TOP falling downwards (random 'o' or '0')
+					const rx = 15 + Math.random() * (this.w - 30);
+					const waterSub = Math.random() > .5 ? 1 : 0;
+					this.spawnBullet(rx, -8, (Math.random() - .5) * 0.3, speedBase * 1.3, 5.5, 'water', waterSub);
+
+					// 2. Fire Hazard: From Left ('>') or Right ('<') side frames shooting inward
+					if (this.timeElapsed > 3.0 && Math.random() < 0.70) {
+						const fromLeft = Math.random() > .5;
+						const fy = 20 + Math.random() * (this.h - 60);
+						const targetX = this.head.x, targetY = this.head.y;
+						const fAng = Math.atan2(targetY - fy, targetX - (fromLeft ? 0 : this.w));
+						const fSpeed = speedBase * 0.52;
+						const pestSub = fromLeft ? 2 : 3;
+						this.spawnBullet(fromLeft ? -8 : this.w + 8, fy, Math.cos(fAng) * fSpeed, Math.sin(fAng) * fSpeed, 6.5, 'pest', pestSub);
+					}
+				}
+			},
+			takeDamage() {
+				if (!this.gameStarted || this.iFrames > 0 || this.gameOver) return;
+				this.hp--;
+				this.iFrames = 60;
+				this.shake = 12;
+				this.flashRed = 1;
+				this.sfx('hit');
+				if (navigator.vibrate) navigator.vibrate([40, 30, 60]);
+				for (let i = 0; i < 12; i++)this.spawnP(this.head.x, this.head.y, 10, Math.random() * 6 - 3, Math.random() * 6 - 3, 0);
+				if (this.hp <= 0) {
+					this.gameOver = !0;
+					this.hintExpanded = !1;
+					this.updateHintUI();
+					if (this.elPlay) {
+						this.elPlay.textContent = '▶';
+						this.elPlay.classList.remove('playing');
+						this.elPlay.title = 'Play Again';
+					}
+				}
+				this.updateHud();
+			},
+			triggerHarvest(plot) {
+				plot.ripe = !1;
+				plot.growth = 0;
+				plot.water = 20;
+				plot.sun = 20;
+				plot.sprinkleFlash = 0;
+				plot.type = this.cropTypes[Math.floor(Math.random() * this.cropTypes.length)];
+				this.harvestCount++;
+				this.score += 150;
+				if (this.hp < this.maxHp) this.hp++;
+				this.sfx('harvest');
+				if (this.blossomCnt < this.maxBlossoms) {
+					const bl = this.blossoms[this.blossomCnt++];
+					bl.x = plot.x; bl.y = plot.y - 16; bl.maxR = Math.max(this.w, this.h) * 0.55; bl.alpha = 1; bl.active = !0;
+				}
+				for (let i = 0; i < 14; i++)this.spawnP(plot.x, plot.y - 16, 10, Math.random() * 6 - 3, Math.random() * 6 - 3, 130);
+				this.updateHud();
+			},
+			updateSunOrb() {
+				const c = this.ctx, so = this.sunOrb;
+				so.pulse += 0.05;
+				if (so.state === 'idle') {
+					// Gentle floating bob
+					const bob = Math.sin(so.pulse) * 2;
+					// Collision with Snake Head to attach
+					const dx = this.head.x - so.x, dy = this.head.y - (so.y + bob), d = Math.sqrt(dx * dx + dy * dy);
+					if (d < so.r + 12) {
+						so.state = 'carried';
+						this.sfx('sunAttach');
+						this.spawnP(so.x, so.y, 6, 0, 0, 45);
+					}
+					// Draw Idle ASCII Sun '֍' (from cached Sprite Slot 4, 40x32)
+					if (this.spriteCanvas) c.drawImage(this.spriteCanvas, 80, 0, 40, 32, Math.round(so.x - 20), Math.round(so.y + bob - 16), 40, 32);
+				} else if (so.state === 'carried') {
+					// Smoothly carries above snake head
+					so.x = this.head.x;
+					so.y = this.head.y - 16;
+					// Check collision with any ground plant to deliver solar energy
+					for (let i = 0; i < this.plots.length; i++) {
+						const p = this.plots[i];
+						const gRatio = p.growth / 100;
+						const stemH = Math.round(6 + gRatio * 26);
+						const topY = p.y - stemH;
+						const pdx = this.head.x - p.x, pdy = this.head.y - topY, pd = Math.sqrt(pdx * pdx + pdy * pdy);
+						if (pd < 26 && p.sun < 95) {
+							p.sun = Math.min(100, p.sun + 50);
+							p.growth = Math.min(100, p.growth + 28);// Significant growth surge per Sun drop
+							p.sprinkleFlash = 14;
+							this.sfx('sun');
+							this.spawnP(p.x, topY, 8, 0, -2, 45);
+							// Delivered! Respawn sun in new air location
+							this.spawnSun();
+							break;
+						}
+					}
+					// Draw Carried ASCII Sun '֍' (from cached Sprite Slot 5, 40x32)
+					if (this.spriteCanvas) c.drawImage(this.spriteCanvas, 120, 0, 40, 32, Math.round(so.x - 20), Math.round(so.y - 16), 40, 32);
+				}
+			},
+			updateSprinkler() {
+				const c = this.ctx;
+				if (this.sprinklerTimer > 0) {
+					this.sprinklerTimer--;
+					// Spawn rapid falling rain streaks from snake body and tail
+					if (this.sprinklerTimer % 2 === 0 && this.sprinklerCnt < this.maxSprinklerP - 1) {
+						for (let rk = 0; rk < 2; rk++) {
+							const sp = this.sprinklerPool[this.sprinklerCnt++];
+							const src = rk === 0 ? this.head : (Math.random() > .5 ? this.body : this.tail);
+							sp.x = src.x + (Math.random() * 14 - 7);
+							sp.y = src.y + 4;
+							sp.vx = (Math.random() - .5) * 0.8;
+							sp.vy = 4.8 + Math.random() * 2.2;// Fast vertical rain speed
+							sp.len = 4 + Math.random() * 3;// Sleek rain streak length
+							sp.life = 35;
+							sp.active = !0;
+						}
+					}
+					if (this.sprinklerTimer === 0) this.updateHud();
+				}
+				// Update and draw active rain shower streaks (Monochrome white/silver)
+				for (let i = this.sprinklerCnt - 1; i >= 0; i--) {
+					const p = this.sprinklerPool[i];
+					if (!p.active) continue;
+					p.x += p.vx; p.y += p.vy;
+					p.life--;
+					// Splash ground plants
+					let hitPlant = !1;
+					for (let k = 0; k < this.plots.length; k++) {
+						const pl = this.plots[k];
+						const gRatio = pl.growth / 100;
+						const stemH = Math.round(6 + gRatio * 26);
+						const topY = pl.y - stemH;
+						if (Math.abs(p.x - pl.x) < 18 && p.y >= topY - 6 && p.y <= pl.y + 4) {
+							pl.water = Math.min(100, pl.water + 15);
+							pl.growth = Math.min(100, pl.growth + 3.2);
+							pl.sprinkleFlash = 12;
+							hitPlant = !0;
+							break;
+						}
+					}
+					if (hitPlant || p.y > this.h - 6 || p.life <= 0) {
+						p.active = !1;
+						this.sprinklerPool[i] = this.sprinklerPool[--this.sprinklerCnt];
+						this.sprinklerPool[this.sprinklerCnt] = p;
+						continue;
+					}
+					// Draw Sleek Rain Streak
+					c.fillStyle = 'rgba(255,255,255,0.75)';
+					c.fillRect(Math.round(p.x), Math.round(p.y), 1.5, p.len || 4);
+					c.fillStyle = '#ffffff';
+					c.fillRect(Math.round(p.x), Math.round(p.y), 1, 1.5);
+				}
+			},
+			updatePlots() {
+				const c = this.ctx;
+				// 1. Blit pre-rendered ASCII ground in a single high-speed GPU draw call (0.02ms)
+				if (this.groundCanvas) c.drawImage(this.groundCanvas, 0, 0, this.w, this.h);
+
+				this.plots.forEach((p, idx) => {
+					p.y = Math.round(this.getGroundY(p.x));
+					if (!p.ripe && this.gameStarted) {
+						if (p.water > 0 && p.sun > 0) {
+							p.growth += 0.075 * p.type.growRate;
+							p.water = Math.max(0, p.water - 0.03);
+							p.sun = Math.max(0, p.sun - 0.03);
+						}
+						if (p.growth >= 100) {
+							p.growth = 100;
+							p.ripe = !0;
+						}
+					}
+					const gRatio = p.growth / 100;
+					// Balanced Proportions for ASCII Plant
+					const stemH = Math.round(6 + gRatio * 26);
+					const tiltX = Math.round((p.tilt || 0) * gRatio * 3.0);
+					const topX = p.x + tiltX;
+					const topY = p.y - stemH;
+					const dx = this.head.x - topX, dy = this.head.y - topY, d = Math.sqrt(dx * dx + dy * dy);
+					if (p.ripe && d < 24 && this.gameStarted) {
+						this.triggerHarvest(p);
+					}
+
+					const isSprinkled = p.sprinkleFlash > 0;
+					if (isSprinkled) p.sprinkleFlash--;
+
+					// 2. ASCII Soil Bed Anchor Base
+					c.textAlign = 'center';
+					c.textBaseline = 'middle';
+					c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+					c.fillStyle = isSprinkled ? '#ffffff' : '#475569';
+					c.fillText('[===]', p.x, p.y + 2);
+
+					// Visual Lightweight Ripple on Plant when sprinkled
+					if (isSprinkled) {
+						const ripR = 8 + (14 - p.sprinkleFlash) * 0.9;
+						c.globalAlpha = Math.max(0, p.sprinkleFlash / 14);
+						c.strokeStyle = '#ffffff';
+						c.lineWidth = 1.5;
+						c.beginPath(); c.arc(p.x, p.y - 2, ripR, 0, Math.PI * 2); c.stroke();
+						c.globalAlpha = 1;
+						c.fillStyle = '#ffffff';
+						c.fillText("'", topX - 6, topY - 4);
+						c.fillText("'", topX + 6, topY - 6);
+					}
+
+					// 3. ASCII Stem & Foliage System
+					const jiggle = isSprinkled ? Math.sin(p.sprinkleFlash * 1.5) * 1.5 : 0;
+					const jx = topX + jiggle;
+
+					if (p.growth < 30) {
+						// Stage 1: Tiny Sprout
+						c.font = 'bold 8px "Press Start 2P", monospace, monospace';
+						c.fillStyle = isSprinkled ? '#ffffff' : '#cbd5e1';
+						c.fillText('v', jx, topY);
+					} else if (!p.ripe) {
+						// Stage 2 & 3: Growing ASCII Stem & Branch Leaves
+						c.font = 'bold 8px monospace';
+						c.fillStyle = isSprinkled ? '#ffffff' : '#94a3b8';
+						// Vertical stem spine
+						const midY = Math.round(p.y - stemH * 0.5);
+						c.fillText('|', jx, midY);
+						c.fillText('|', jx, topY + 4);
+
+						// Symmetrical / Angled branch leaves
+						if (gRatio > 0.45) {
+							c.fillStyle = isSprinkled ? '#ffffff' : '#cbd5e1';
+							c.fillText('\\', jx - 5, midY + 2);
+							c.fillText('/', jx + 5, midY - 2);
+						}
+						if (gRatio > 0.75) {
+							c.fillStyle = '#ffffff';
+							c.fillText('*', jx, topY - 2);// Developing bud
+						}
+					} else {
+						// Stage 4: Fully Ripe Emphasized ASCII Art Fruit/Flower Head
+						const bob = Math.sin(Date.now() * .008 + idx) * 2.5;
+						const fy = topY + bob + jiggle;
+
+						// Stem connection
+						c.font = 'bold 8px monospace';
+						c.fillStyle = '#64748b';
+						c.fillText('|', jx, p.y - 8);
+						c.fillText('|', jx, fy + 8);
+
+						if (p.type.name === 'Berry') {
+							// Wild Cluster Berry: Calyx crown + (@) berry head
+							c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#cbd5e1';
+							c.fillText('\\ /', jx, fy - 6);
+							c.font = 'bold 9px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#ffffff';
+							c.fillText('(@)', jx, fy + 2);
+						} else if (p.type.name === 'Carrot') {
+							// Feathery Carrot ASCII: \V/ carrot greens + \/ root
+							c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#ffffff';
+							c.fillText('\\V/', jx, fy - 6);
+							c.font = 'bold 8px monospace';
+							c.fillStyle = '#e2e8f0';
+							c.fillText('\\/', jx, fy);
+							c.fillText('V', jx, fy + 5);
+						} else if (p.type.name === 'Flower') {
+							// Signature ASCII Daisy Bloom: \|/ foliage + (✿) daisy
+							c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#cbd5e1';
+							c.fillText('\\|/', jx, fy - 6);
+							c.font = 'bold 10px system-ui, sans-serif';
+							c.fillStyle = '#ffffff';
+							c.fillText('(✿)', jx, fy + 2);
+						} else {
+							// Cozy Kabocha Squash: -|- stalk + (O) ribbed gourd
+							c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#cbd5e1';
+							c.fillText('-|-', jx, fy - 6);
+							c.font = 'bold 9px "Press Start 2P", monospace, monospace';
+							c.fillStyle = '#ffffff';
+							c.fillText('(O)', jx, fy + 2);
+						}
+
+						// Subtle floating sparkle character bobbing above ripe crop
+						c.font = 'bold 7px "Press Start 2P", monospace, monospace';
+						c.fillStyle = '#ffffff';
+						c.fillText('*', jx, fy - 12 + Math.sin(Date.now() * 0.01 + idx) * 1.5);
+					}
+
+					// 4. Mini Monochrome Growth Indicator Bar
+					const barW = 16;
+					c.fillStyle = 'rgba(255,255,255,0.15)';
+					c.fillRect(p.x - barW / 2, this.h - 4, barW, 2);
+					c.fillStyle = isSprinkled ? '#ffffff' : (p.ripe ? '#ffffff' : '#94a3b8');
+					c.fillRect(p.x - barW / 2, this.h - 4, Math.round(barW * (p.growth / 100)), 2);
+				});
+			},
+			updateBlossoms() {
+				const c = this.ctx;
+				for (let i = this.blossomCnt - 1; i >= 0; i--) {
+					const b = this.blossoms[i];
+					b.r += 5.5;
+					b.alpha = Math.max(0, 1 - b.r / b.maxR);
+					for (let k = 0; k < this.bCnt; k++) {
+						const bu = this.bullets[k];
+						if (bu.active && bu.kind === 'pest') {
+							const bx = bu.x - b.x, by = bu.y - b.y, bd = Math.sqrt(bx * bx + by * by);
+							if (Math.abs(bd - b.r) < 16) {
+								bu.kind = 'water';
+								bu.subKind = Math.random() > .5 ? 1 : 0;
+								bu.vx *= .5; bu.vy *= .5;
+							}
+						}
+					}
+					c.globalAlpha = Math.max(0, b.alpha * 0.7);
+					c.strokeStyle = '#ffffff';
+					c.lineWidth = 2.5;
+					c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.stroke();
+					c.globalAlpha = 1;
+					if (b.alpha <= 0) {
+						this.blossoms[i] = this.blossoms[--this.blossomCnt];
+						this.blossoms[this.blossomCnt] = b; b.active = !1;
+					}
+				}
+			},
+			drawBulletShape(c, b) {
+				c.save(); c.translate(b.x, b.y);
+				if (b.kind === 'water') {
+					const sx = b.subKind === 1 ? 20 : 0;
+					if (this.spriteCanvas) c.drawImage(this.spriteCanvas, sx, 0, 20, 24, -10, -12, 20, 24);
+				} else {
+					const sx = b.subKind === 3 ? 60 : 40;
+					if (this.spriteCanvas) c.drawImage(this.spriteCanvas, sx, 0, 20, 24, -10, -12, 20, 24);
+				}
+				c.restore();
+			},
+			updateBulletsAndPests() {
+				const c = this.ctx;
+				for (let i = this.bCnt - 1; i >= 0; i--) {
+					const b = this.bullets[i];
+					if (!b.active) continue;
+					b.x += b.vx; b.y += b.vy;
+					if (b.x < -20 || b.x > this.w + 20 || b.y < -20 || b.y > this.h + 20) {
+						this.removeBullet(i); continue;
+					}
+					const dx = this.head.x - b.x, dy = this.head.y - b.y, d = Math.sqrt(dx * dx + dy * dy);
+					const hitR = b.r + 6;
+					const grazeR = b.r + 20;
+					if (d < hitR) {
+						if (b.kind === 'pest') {
+							this.takeDamage();
+						} else {
+							// Collect falling water droplet toward threshold
+							this.score += 20;
+							this.sfx('water');
+							this.spawnP(b.x, b.y, 5, 0, 0, 195);
+							if (this.sprinklerTimer <= 0) {
+								this.waterCollected++;
+								if (this.waterCollected >= this.waterThreshold) {
+									this.waterCollected = 0;
+									this.sprinklerTimer = 210;// ~3.5s sprinkler mode
+									this.sfx('sprinklerStart');
+								}
+								this.updateHud();
+							}
+						}
+						this.removeBullet(i);
+						continue;
+					} else if (d < grazeR && !b.grazed) {
+						b.grazed = !0;
+						this.grazeCount++;
+						this.score += 15;
+						this.ten = Math.min(1, this.ten + .14);
+						this.sfx('graze');
+						this.spawnP(b.x, b.y, 5, 0, 0, 130);
+						this.updateHud();
+					}
+					this.drawBulletShape(c, b);
+				}
+			},
+			removeBullet(idx) {
+				const b = this.bullets[idx];
+				b.active = !1;
+				this.bullets[idx] = this.bullets[--this.bCnt];
+				this.bullets[this.bCnt] = b;
+			},
+			drawGameOver() {
+				const c = this.ctx;
+				c.fillStyle = 'rgba(6,16,14,0.92)';
+				c.fillRect(0, 0, this.w, this.h);
+				c.textAlign = 'center';
+				c.font = 'bold 16px "Press Start 2P", monospace, monospace';
+				c.fillStyle = '#ffffff';
+				c.fillText('HARVEST DAY OVER', this.w / 2, this.h / 2 - 45);
+				c.font = '12px monospace';
+				c.fillStyle = '#e2e8f0';
+				c.fillText(`CROPS HARVESTED: 🧺 ${this.harvestCount}`, this.w / 2, this.h / 2 - 10);
+				c.fillText(`GARDEN SURVIVED: ${this.timeElapsed.toFixed(1)}s`, this.w / 2, this.h / 2 + 15);
+				c.font = 'bold 10px monospace';
+				c.fillStyle = '#94a3b8';
+				c.fillText('TAP ▶ IN CONTROLS OR SPACE TO RESTART', this.w / 2, this.h / 2 + 60);
+			},
+			draw() {
+				const c = this.ctx, spd = this.lp ? this.lp.spd : 0, tmp = Math.min(1, spd / 18);
+				if (this.flashRed > 0) {
+					c.globalAlpha = Math.max(0, this.flashRed * .35);
+					c.fillStyle = '#ffffff';
+					c.fillRect(0, 0, this.w, this.h);
+					c.globalAlpha = 1;
+					this.flashRed -= .08;
+				}
+				if (this.iFrames > 0 && (Math.floor(this.iFrames / 4) % 2 === 0)) return;
+
+				// 1. Record snake position into zero-allocation ghost shadow buffer
+				if (this.trailTimer++ % 2 === 0) {
+					const oldest = this.snakeTrail.pop();
+					oldest.hx = this.head.x; oldest.hy = this.head.y; oldest.ha = this.head.a;
+					oldest.bx = this.body.x; oldest.by = this.body.y; oldest.ba = this.body.a;
+					oldest.tx = this.tail.x; oldest.ty = this.tail.y; oldest.ta = this.tail.a;
+					oldest.wig = this.wig; oldest.tmp = tmp; oldest.active = !0;
+					this.snakeTrail.unshift(oldest);
+				}
+
+				// 2. Render dedicated ghost shadow trail of the snake
+				for (let k = this.maxSnakeTrail - 1; k >= 0; k--) {
+					const tr = this.snakeTrail[k];
+					if (!tr.active) continue;
+					const trAlpha = (this.maxSnakeTrail - k) / (this.maxSnakeTrail * 4.5);
+					c.save();
+					c.globalAlpha = trAlpha;
+					const trSegs = [
+						[tr.tx, tr.ty, tr.ta, tr.tmp > .6 ? '#1e293b' : 'rgba(255,255,255,0.2)', this.tail.r, this.tail.sz, this.tail.sz, 0],
+						[tr.bx, tr.by, tr.ba, tr.tmp > .6 ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.5)', this.body.r, this.body.sz, this.body.sz, 1],
+						[tr.hx, tr.hy, tr.ha, tr.tmp > .6 ? '#ffffff' : 'rgba(255,255,255,0.85)', this.head.r, this.head.w || this.head.sz, this.head.h || this.head.sz, 2]
+					];
+					trSegs.forEach(([gx, gy, ga, col, r, w, h, i]) => {
+						const wg = Math.sin(tr.wig - (2 - i) * .55) * (i === 0 ? 4.5 : i === 1 ? 2.5 : 1.2);
+						c.save(); c.translate(gx, gy); c.rotate(ga); c.translate(0, wg);
+						c.fillStyle = col; c.beginPath();
+						if (c.roundRect) c.roundRect(-w / 2, -h / 2, w, h, r); else c.rect(-w / 2, -h / 2, w, h);
+						c.fill();
+						c.restore();
+					});
+					c.restore();
+				}
+
+				// 3. Sprinkler Shower Aura around Snake
+				if (this.sprinklerTimer > 0) {
+					c.save();
+					c.strokeStyle = 'rgba(255,255,255,0.7)';
+					c.lineWidth = 2.5;
+					[this.tail, this.body, this.head].forEach(sg => {
+						c.beginPath(); c.arc(sg.x, sg.y, (sg.sz || 18) * 0.6 + 3, 0, Math.PI * 2); c.stroke();
+					});
+					c.restore();
+				}
+
+				// 4. Main Snake Body & Arch Eyes
+				const segs = [
+					[this.tail, tmp > .6 ? '#1e293b' : (this.sprinklerTimer > 0 ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.2)'), this.tail.r, this.tail.sz, this.tail.sz, 0],
+					[this.body, tmp > .6 ? 'rgba(255,255,255,0.6)' : (this.sprinklerTimer > 0 ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.5)'), this.body.r, this.body.sz, this.body.sz, 1],
+					[this.head, tmp > .6 ? '#ffffff' : (this.sprinklerTimer > 0 ? '#ffffff' : 'rgba(255,255,255,0.85)'), this.head.r, this.head.w || this.head.sz, this.head.h || this.head.sz, 2]
+				];
+				segs.forEach(([sg, col, r, w, h, i]) => {
+					const wg = Math.sin(this.wig - (2 - i) * .55) * (i === 0 ? 4.5 : i === 1 ? 2.5 : 1.2);
+					c.save(); c.translate(sg.x, sg.y); c.rotate(sg.a); c.translate(0, wg);
+					// Render clean serpentine ghost segment body (square body/tail, taller head)
+					c.fillStyle = col; c.beginPath();
+					if (c.roundRect) c.roundRect(-w / 2, -h / 2, w, h, r); else c.rect(-w / 2, -h / 2, w, h);
+					c.fill();
+					if (i === 2) {
+						// 2 Arch Ghost Eyes positioned closer to the right side with top tilted right
+						c.save();
+						c.translate(2.2, -0.8);
+						c.rotate(0.12);
+						c.fillStyle = '#06100e';
+						if (this.blk.c) {
+							// Blinking: Eyes shut into thin horizontal slits
+							c.fillRect(-4.5, 0.8, 3.8, 1.8);
+							c.fillRect(1.5, 0.8, 3.8, 1.8);
+						} else {
+							// Open: 2 rounded arch eyes with flat base
+							c.beginPath();
+							if (c.roundRect) {
+								c.roundRect(-4.5, -5, 3.8, 7.2, [2, 2, 0, 0]);
+								c.roundRect(1.5, -5, 3.8, 7.2, [2, 2, 0, 0]);
+							} else {
+								c.rect(-4.5, -5, 3.8, 7.2);
+								c.rect(1.5, -5, 3.8, 7.2);
+							}
+							c.fill();
+						}
+						c.restore();
+					}
+					c.restore();
+				});
+			},
+			tick(now) {
+				if (!this.run) return;
+				requestAnimationFrame(ts => this.tick(ts));
+				if (!now) now = performance.now();
+				if (!this.lastFrameTime) this.lastFrameTime = now;
+				const delta = now - this.lastFrameTime;
+				if (delta < 14.5) return;// 60 FPS Frame Pacing Cap (tolerates slight 16.6ms rAF clock jitter)
+				this.lastFrameTime = now - (delta % 16.666);
+
+				if (typeof procK === 'function') procK();
+				if (this.lp) this.pMov(this.tgt.x, this.tgt.y);
+
+				const c = this.ctx;
+				c.save();
+				if (this.shake > 0) {
+					const sx = (Math.random() - .5) * this.shake, sy = (Math.random() - .5) * this.shake;
+					c.translate(sx, sy);
+					this.shake *= .85; if (this.shake < .5) this.shake = 0;
+				}
+				c.fillStyle = '#06100e'; c.fillRect(0, 0, this.w, this.h);
+				this.updatePlots();
+				if (this.gameStarted && !this.gameOver) {
+					this.timeElapsed += 1 / 60;
+					this.score += 1 / 6;
+					this.updateHud();
+					this.spawnWeatherAndPests(Date.now());
+					if (this.iFrames > 0) this.iFrames--;
+					this.updateSunOrb();
+					this.updateSprinkler();
+					this.updateBulletsAndPests();
+					this.updateBlossoms();
+				}
+				if (this.ten > 0) this.ten -= .006;
+				const dotCol = this.ten > .5 ? '#ffffff' : (this.ten > .2 ? '#cbd5e1' : '#94a3b8');
+				if (this.elDot && this._lDot !== dotCol) {
+					this._lDot = dotCol;
+					this.elDot.style.background = dotCol;
+				}
+				this.wig += .09; this.blk.t--;
+				if (this.blk.t <= 0) { this.blk.c = !this.blk.c; this.blk.t = this.blk.c ? 8 : 80 + Math.random() * 180; }
+				this.head.x += (this.tgt.x - this.head.x) * .32; this.head.y += (this.tgt.y - this.head.y) * .32;
+				let dt = this.head.ta - this.head.a; dt = Math.atan2(Math.sin(dt), Math.cos(dt)); this.head.a += dt * .25;
+				this.fol(this.body, this.head, this.body.d); this.fol(this.tail, this.body, this.tail.d);
+				for (let i = this.pCnt - 1; i >= 0; i--) {
+					const p = this.pts[i]; p.x += p.vx; p.y += p.vy; p.vx *= .94; p.vy *= .94; p.l -= p.dc;
+					if (p.l <= 0) {
+						this.pts[i] = this.pts[--this.pCnt];
+						this.pts[this.pCnt] = p;
+						continue;
+					}
+					const psz = Math.max(2, Math.round(p.s * p.l));
+					c.globalAlpha = Math.max(0, p.l);
+					c.fillStyle = p.c || '#ffffff';
+					c.fillRect(Math.floor(p.x - psz / 2), Math.floor(p.y - psz / 2), psz, psz);
+				}
+				c.globalAlpha = 1;
+				this.draw();
+				if (this.gameOver) {
+					this.drawGameOver();
+				}
+				c.restore();
+			},
+			pDown(x, y) {
+				this.iAud();
+				if (this.gameOver) { this.reset(); this.startGame(); return; }
+				this.lp = { x, y, vx: 0, vy: 0, spd: 0 }; this.lt = performance.now(); this.tgt.x = x; this.tgt.y = y; this.pMov(x, y);
+			},
+			pMove(x, y) { if (!this.gameOver) { this.tgt.x = x; this.tgt.y = y; } },
+			pUp() { this.lp = null; },
+			pMov(x, y) {
+				const nw = performance.now(), dt = Math.max(1, nw - this.lt); let spd = 0, vx = 0, vy = 0;
+				if (this.lp) { vx = (x - this.lp.x) / (dt / 16); vy = (y - this.lp.y) / (dt / 16); spd = Math.sqrt(vx * vx + vy * vy); }
+				this.lp = { x, y, vx, vy, spd }; this.lt = nw;
+				if (spd > 10) this.ten = Math.min(1, this.ten + .14);
+				if (spd > .2) this.head.ta = Math.atan2(vy, vx);
+				if (spd > 1) this.spawnP(x, y, spd, vx, vy, this.sprinklerTimer > 0 ? 195 : undefined);
+				if (spd > 2) this.tone(y, spd);
+				if (navigator.vibrate && spd > 16) navigator.vibrate(8);
+			},
+			start() { if (!this.run) { this.run = !0; this.rsz(); this.tick(); } }
+		};
+		const ctrl = document.getElementById('controls-wrapper'), jB = document.getElementById('joy-base'), jS = document.getElementById('joy-stick');
+		let jAct = !1, jSt = { x: 0, y: 0 }; const JR = 40;
+		function hPtr(e, tp) {
+			if (!S) return; const rc = ctrl.getBoundingClientRect();
+			let cx = e.clientX, cy = e.clientY;
+			if (cx === undefined && e.touches && e.touches[0]) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+			else if (cx === undefined && e.changedTouches && e.changedTouches[0]) { cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+			if (cx === undefined) return;
+			const rx = cx - rc.left, ry = cy - rc.top, tx = Math.max(0, Math.min(1, rx / (rc.width || 1))) * S.w, ty = Math.max(0, Math.min(1, ry / (rc.height || 1))) * S.h;
+			if (tp === 'd') {
+				jAct = !0; jSt = { x: rx, y: ry }; if (jB) { jB.style.left = `${rx}px`; jB.style.top = `${ry}px`; jB.style.display = 'block'; }
+				if (jS) jS.style.transform = 'translate(-50%,-50%)'; S.pDown(tx, ty);
+			} else if (tp === 'm') {
+				if (!jAct) return;
+				if (jB && jS) {
+					let dx = rx - jSt.x, dy = ry - jSt.y, d = Math.sqrt(dx * dx + dy * dy);
+					if (d > JR) { dx = (dx / d) * JR; dy = (dy / d) * JR; }
+					jS.style.transform = `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
+				}
+				S.pMove(tx, ty);
+			} else if (tp === 'u') { if (jAct) { jAct = !1; if (jB) jB.style.display = 'none'; S.pUp(); } }
+		}
+		if (ctrl) {
+			ctrl.addEventListener('pointerdown', e => {
+				e.preventDefault(); hPtr(e, 'd');
+			}, { passive: !1 });
+			ctrl.addEventListener('pointermove', e => {
+				e.preventDefault(); hPtr(e, 'm');
+			}, { passive: !1 });
+			ctrl.addEventListener('pointerup', () => hPtr(null, 'u'));
+			ctrl.addEventListener('pointercancel', () => hPtr(null, 'u'));
+		}
+		const canvasEl = document.getElementById('snake-canvas');
+		if (canvasEl) {
+			canvasEl.addEventListener('pointerdown', e => {
+				e.preventDefault();
+				if (S.gameOver) { S.reset(); S.startGame(); }
+			}, { passive: !1 });
+		}
+		const joyHintEl = document.getElementById('joy-hint');
+		if (joyHintEl) {
+			joyHintEl.addEventListener('pointerdown', e => {
+				e.stopPropagation();
+				e.preventDefault();
+				if (S.gameStarted && !S.gameOver) {
+					S.hintExpanded = !S.hintExpanded;
+					S.updateHintUI();
+				}
+			}, { passive: !1 });
+		}
+		const K = {}; window.addEventListener('keydown', e => {
+			K[e.key.toLowerCase()] = !0;
+			if (e.code === 'Space') {
+				if (S.gameOver || !S.gameStarted) { S.reset(); S.startGame(); }
+			}
+		});
+		window.addEventListener('keyup', e => { K[e.key.toLowerCase()] = !1; });
+		let kd = !1, kx = 0, ky = 0;
+		function procK() {
+			let dx = 0, dy = 0; if (K.arrowup || K.w) dy -= 1; if (K.arrowdown || K.s) dy += 1; if (K.arrowleft || K.a) dx -= 1; if (K.arrowright || K.d) dx += 1;
+			if (dx || dy) {
+				if (!kd) { kd = !0; kx = S.head.x; ky = S.head.y; S.pDown(kx, ky); }
+				kx = Math.max(10, Math.min(S.w - 10, kx + dx * 9)); ky = Math.max(10, Math.min(S.h - 10, ky + dy * 9));
+				S.pMove(kx, ky);
+			} else if (kd) { kd = !1; S.pUp(); }
+		}
+		const btnPlay = document.getElementById('btn-play');
+		if (btnPlay) {
+			btnPlay.onclick = e => {
+				e.stopPropagation();
+				S.iAud();
+				if (!S.gameStarted || S.gameOver) {
+					S.reset();
+					S.startGame();
+				} else {
+					S.reset();
+				}
+			};
+		}
+		document.getElementById('btn-audio').onclick = e => {
+			e.stopPropagation(); S.iAud(); S.snd = !S.snd;
+			e.target.textContent = S.snd ? '🔊' : '🔇';
+		};
+		['pointerdown', 'touchstart', 'mousedown', 'keydown'].forEach(ev => window.addEventListener(ev, () => S.iAud(), { once: !0, passive: !0 }));
+		window.addEventListener('DOMContentLoaded', () => { const c = document.getElementById('snake-canvas'); if (c) { S.init(c); S.start(); } });
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('./sw.js').catch(() => {});
+			});
+		}
+	</script>
+</body>
+
+</html>
