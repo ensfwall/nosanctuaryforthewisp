@@ -97,7 +97,38 @@
 		.joy-hint .hint-head {
 			color: #ffffff;
 			letter-spacing: 0.5px;
+			margin-bottom: 4px
+		}
+
+		.joy-hint .hint-line {
+			display: flex;
+			align-items: center;
+			gap: 6px;
 			margin-bottom: 2px
+		}
+
+		.joy-hint .hint-sym {
+			font-size: 15px;
+			line-height: 1;
+			font-weight: bold;
+			min-width: 16px;
+			text-align: center;
+			display: inline-block;
+			color: #ffffff;
+			flex-shrink: 0
+		}
+
+		.joy-hint .hint-sym.fire {
+			color: #f43f5e;
+			font-size: 11px;
+			font-family: 'Press Start 2P', monospace;
+			letter-spacing: -1.5px
+		}
+
+		.joy-hint .hint-sym.star {
+			font-size: 11px;
+			font-family: 'Press Start 2P', monospace;
+			color: #ffffff
 		}
 
 		.joy-hint .hint-min {
@@ -141,18 +172,9 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+			gap: 4px;
 			pointer-events: none;
 			z-index: 10
-		}
-
-		.pill {
-			background: #0c1814;
-			border: 1px solid rgba(255, 255, 255, .25);
-			border-radius: 99px;
-			padding: 3px 8px;
-			display: flex;
-			align-items: center;
-			gap: 5px
 		}
 
 		.dot {
@@ -163,14 +185,6 @@
 			transition: background .3s
 		}
 
-		.title {
-			font-size: 9.5px;
-			font-weight: 700;
-			color: #ffffff;
-			font-family: monospace;
-			letter-spacing: 0.5px
-		}
-
 		.stat-pill {
 			background: #0c1814;
 			border: 1px solid rgba(255, 255, 255, .25);
@@ -178,10 +192,34 @@
 			padding: 3px 8px;
 			display: flex;
 			align-items: center;
-			gap: 5px;
+			justify-content: center;
+			gap: 4px;
 			font-size: 9.5px;
 			font-family: monospace;
-			color: #f0fdf4
+			color: #f0fdf4;
+			white-space: nowrap;
+			transition: background-color .35s ease, border-color .35s ease, box-shadow .35s ease, transform .2s ease
+		}
+
+		.stat-pill.flash-green {
+			background: rgba(34, 197, 94, .3) !important;
+			border-color: #22c55e !important;
+			box-shadow: 0 0 10px rgba(34, 197, 94, .45);
+			transform: scale(1.06)
+		}
+
+		.stat-pill.flash-red {
+			background: rgba(239, 68, 68, .35) !important;
+			border-color: #ef4444 !important;
+			box-shadow: 0 0 10px rgba(239, 68, 68, .45);
+			transform: scale(1.06)
+		}
+
+		.stat-pill.flash-blue {
+			background: rgba(56, 189, 248, .35) !important;
+			border-color: #38bdf8 !important;
+			box-shadow: 0 0 10px rgba(56, 189, 248, .45);
+			transform: scale(1.06)
 		}
 
 		.stat-val {
@@ -227,6 +265,119 @@
 			border-color: #ffffff;
 			color: #ffffff;
 			box-shadow: none
+		}
+
+		.btn-install {
+			font-size: 11px;
+			display: none;
+		}
+
+		.btn-install.visible {
+			display: flex;
+		}
+
+		.pwa-modal-overlay {
+			position: fixed;
+			inset: 0;
+			background: rgba(0, 0, 0, 0.78);
+			z-index: 1000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 16px;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.25s ease;
+		}
+
+		.pwa-modal-overlay.show {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.pwa-modal-card {
+			background: #0d1715;
+			border: 1.5px solid rgba(255, 255, 255, 0.3);
+			border-radius: 20px;
+			padding: 18px;
+			max-width: 310px;
+			width: 100%;
+			box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.1);
+			color: #ffffff;
+			text-align: center;
+			font-family: monospace;
+			position: relative;
+		}
+
+		.pwa-modal-close {
+			position: absolute;
+			top: 10px;
+			right: 12px;
+			background: transparent;
+			border: none;
+			color: #94a3b8;
+			font-size: 16px;
+			cursor: pointer;
+			padding: 4px 8px;
+		}
+
+		.pwa-modal-title {
+			font-family: 'Press Start 2P', monospace;
+			font-size: 10px;
+			line-height: 1.5;
+			color: #ffffff;
+			margin-bottom: 12px;
+			letter-spacing: 0.5px;
+		}
+
+		.pwa-modal-desc {
+			font-size: 10px;
+			line-height: 1.5;
+			color: #cbd5e1;
+			margin-bottom: 14px;
+			text-align: left;
+		}
+
+		.pwa-step-item {
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 8px;
+			font-size: 10px;
+		}
+
+		.pwa-step-num {
+			background: rgba(255, 255, 255, 0.2);
+			color: #ffffff;
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+			flex-shrink: 0;
+			font-size: 9px;
+		}
+
+		.pwa-install-btn {
+			background: #ffffff;
+			color: #06100e;
+			font-family: 'Press Start 2P', monospace;
+			font-size: 9px;
+			font-weight: bold;
+			border: none;
+			border-radius: 12px;
+			padding: 10px 14px;
+			cursor: pointer;
+			width: 100%;
+			margin-top: 6px;
+			box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
+			transition: transform 0.15s ease;
+		}
+
+		.pwa-install-btn:active {
+			transform: scale(0.96);
 		}
 
 		#controls-wrapper {
@@ -357,24 +508,24 @@
 			<div class="joy-hint" id="joy-hint">
 				<div id="joy-hint-min" class="hint-min">📖 HOW TO PLAY</div>
 				<div id="joy-hint-full" class="hint-full">
-					<div class="hint-head">GROW PLANTS BY:</div>
-					<div>֍ CARRY SUN TO ENERGIZE PLANTS</div>
-					<div>o COLLECT 3 WATER TO SPRAY PLANTS</div>
-					<div>&lt;&gt; DODGE HAZARDS TO AVOID DEATH</div>
-					<div>* KEEP GROWING TO STAY ALIVE</div>
+					<div class="hint-head">FARMING PLANTS BY:</div>
+					<div class="hint-line"><span class="hint-sym">☼</span> Carry SUN to accelerate the plant's growth</div>
+					<div class="hint-line"><span class="hint-sym">o</span> Collect 3 WATER TO watering plants</div>
+					<div class="hint-line"><span class="hint-sym fire">&lt;&gt;</span> Dodge HAZARDS to avoid death</div>
+					<div class="hint-line"><span class="hint-sym star">!</span> HARVEST crops to stay alive</div>
 				</div>
 			</div>
 			<div class="canvas-actions">
+				<button id="btn-install" class="btn btn-install" title="Install App">📲</button>
 				<button id="btn-play" class="btn btn-play" title="Start Harvest">▶</button>
 				<button id="btn-audio" class="btn" title="Audio">🔊</button>
 			</div>
 		</div>
 		<div id="hud-container">
-			<div class="pill">
-				<div id="hud-dot" class="dot"></div><span class="title">ASCII HARVEST</span>
-			</div>
-			<div class="stat-pill"><span id="hud-crops">🧺 0</span> <span id="hud-water" class="stat-val">💧 0/3</span>
-				<span id="hud-hp" class="stat-hp">❤❤❤</span> <span id="hud-time" class="stat-val">READY</span></div>
+			<div id="pill-crops" class="stat-pill"><span id="hud-crops">🧺 0</span></div>
+			<div id="pill-water" class="stat-pill"><span id="hud-water" class="stat-val">💧 0/3</span></div>
+			<div id="pill-hp" class="stat-pill"><span id="hud-hp" class="stat-hp">❤❤❤</span></div>
+			<div id="pill-time" class="stat-pill"><div id="hud-dot" class="dot"></div><span id="hud-time" class="stat-val">READY</span></div>
 		</div>
 		<div id="controls-wrapper">
 			<div class="joy-ghost-eyes">
@@ -418,9 +569,10 @@
 			harvestCount: 0, hp: 3, maxHp: 3, iFrames: 0, score: 0, grazeCount: 0,
 			timeElapsed: 0, lastSpawn: 0, patternIdx: 0, patternTimer: 0,
 			gameStarted: !1, gameOver: !1, shake: 0, flashRed: 0,
-			hintExpanded: !1,
+			hintExpanded: !1, bestTime: 0, isNewBest: !1,
 			// Cached DOM references & frame timing
 			elCr: null, elWt: null, elHp: null, elTm: null, elDot: null, elPlay: null, elHint: null,
+			elPillCr: null, elPillWt: null, elPillHp: null,
 			_lCr: -1, _lWt: '', _lHp: -1, _lTm: '', _lDot: '',
 			lastFrameTime: 0,
 			cropTypes: [
@@ -429,6 +581,13 @@
 				{ name: 'Flower', icon: '🌸', growRate: 1.2 },
 				{ name: 'Pumpkin', icon: '🎃', growRate: 0.9 }
 			],
+			triggerFlash(el, cls) {
+				if (!el || !this.gameStarted || this.gameOver) return;
+				el.classList.remove('flash-green', 'flash-red', 'flash-blue');
+				void el.offsetWidth;
+				el.classList.add(cls);
+				setTimeout(() => { if (el) el.classList.remove(cls); }, 350);
+			},
 			updateHintUI() {
 				if (!this.elHint) this.elHint = document.getElementById('joy-hint');
 				if (!this.elHint) return;
@@ -444,6 +603,7 @@
 			},
 			init(el) {
 				this.c = el; this.ctx = el.getContext('2d', { alpha: !1 });
+				try { this.bestTime = parseFloat(localStorage.getItem('13kbsnake_best_time')) || 0; } catch (e) { this.bestTime = 0; }
 				this.groundCanvas = document.createElement('canvas');
 				this.groundCtx = this.groundCanvas.getContext('2d');
 				this.spriteCanvas = document.createElement('canvas');
@@ -457,6 +617,9 @@
 				this.elDot = document.getElementById('hud-dot');
 				this.elPlay = document.getElementById('btn-play');
 				this.elHint = document.getElementById('joy-hint');
+				this.elPillCr = document.getElementById('pill-crops');
+				this.elPillWt = document.getElementById('pill-water');
+				this.elPillHp = document.getElementById('pill-hp');
 				this.rsz();
 				// Preallocate fixed object pools for 0 GC overhead
 				for (let i = 0; i < this.maxP; i++)this.pts.push({ x: 0, y: 0, vx: 0, vy: 0, c: '#ffffff', l: 0, dc: 0, s: 0 });
@@ -484,27 +647,27 @@
 				sc.fillStyle = '#ffffff';
 				sc.fillText('0', 30, 12);
 
-				// 3. Fire Hazard '>' (Slot 2, x: 40..59, y: 0..23, center: 50, 12) - 13px
+				// 3. Fire Hazard '>' (Slot 2, x: 40..59, y: 0..23, center: 50, 12) - 13px (Vibrant Red)
 				sc.font = 'bold 13px "Press Start 2P", monospace, monospace';
-				sc.fillStyle = '#ffffff';
+				sc.fillStyle = '#f43f5e';
 				sc.fillText('>', 50, 12);
 
-				// 4. Fire Hazard '<' (Slot 3, x: 60..79, y: 0..23, center: 70, 12) - 13px
+				// 4. Fire Hazard '<' (Slot 3, x: 60..79, y: 0..23, center: 70, 12) - 13px (Vibrant Red)
 				sc.font = 'bold 13px "Press Start 2P", monospace, monospace';
-				sc.fillStyle = '#ffffff';
+				sc.fillStyle = '#f43f5e';
 				sc.fillText('<', 70, 12);
 
-				// 5. Sun Orb '֍' Idle (Slot 4, x: 80..119, y: 0..32, center: 100, 16) - 22px
+				// 5. Sun Orb '☼' Idle (Slot 4, x: 80..119, y: 0..32, center: 100, 16) - 22px
 				sc.font = 'bold 22px system-ui, sans-serif';
 				sc.fillStyle = '#ffffff';
-				sc.fillText('֍', 100, 16);
+				sc.fillText('☼', 100, 16);
 
-				// 6. Sun Orb '֍' Carried (Slot 5, x: 120..159, y: 0..32, center: 140, 16) - 23px
+				// 6. Sun Orb '☼' Carried (Slot 5, x: 120..159, y: 0..32, center: 140, 16) - 23px
 				sc.font = 'bold 23px system-ui, sans-serif';
 				sc.fillStyle = '#ffffff';
 				sc.shadowColor = 'rgba(255,255,255,0.85)';
 				sc.shadowBlur = 6;
-				sc.fillText('֍', 140, 16);
+				sc.fillText('☼', 140, 16);
 				sc.shadowBlur = 0;
 			},
 			getGroundY(x) {
@@ -628,7 +791,7 @@
 				this.waterCollected = 0; this.sprinklerTimer = 0;
 				this.hp = this.maxHp; this.iFrames = 0; this.score = 0; this.grazeCount = 0; this.harvestCount = 0;
 				this.timeElapsed = 0; this.lastSpawn = 0; this.patternIdx = 0; this.patternTimer = 0;
-				this.gameStarted = !1;
+				this.gameStarted = !1; this.isNewBest = !1;
 				this.gameOver = !1; this.shake = 0; this.flashRed = 0;
 				this.hintExpanded = !1;
 				this.updateHintUI();
@@ -662,32 +825,46 @@
 				try {
 					const osc = this.actx.createOscillator(), g = this.actx.createGain();
 					if (type === 'hit') {
-						osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, nw); osc.frequency.exponentialRampToValueAtTime(30, nw + .22);
-						g.gain.setValueAtTime(.2, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .22);
-						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .24);
+						// Gentle spirit dispersion chime
+						osc.type = 'sine'; osc.frequency.setValueAtTime(220, nw); osc.frequency.exponentialRampToValueAtTime(80, nw + .25);
+						g.gain.setValueAtTime(.15, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .25);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .26);
+					} else if (type === 'death') {
+						osc.type = 'sawtooth'; osc.frequency.setValueAtTime(260, nw); osc.frequency.exponentialRampToValueAtTime(25, nw + .35);
+						g.gain.setValueAtTime(.3, nw); g.gain.exponentialRampToValueAtTime(.0001, nw + .38);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .4);
+						const osc2 = this.actx.createOscillator(), g2 = this.actx.createGain();
+						osc2.type = 'square'; osc2.frequency.setValueAtTime(130, nw); osc2.frequency.linearRampToValueAtTime(40, nw + .25);
+						g2.gain.setValueAtTime(.15, nw); g2.gain.exponentialRampToValueAtTime(.0001, nw + .28);
+						osc2.connect(g2); g2.connect(this.actx.destination); osc2.start(nw); osc2.stop(nw + .3);
 					} else if (type === 'water' || type === 'sun') {
-						osc.type = 'sine'; osc.frequency.setValueAtTime(type === 'water' ? 620 : 740, nw); osc.frequency.exponentialRampToValueAtTime(type === 'water' ? 880 : 980, nw + .07);
-						g.gain.setValueAtTime(.04, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .07);
-						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .08);
+						// Crystalline moon dew / sun tone
+						osc.type = 'sine'; osc.frequency.setValueAtTime(type === 'water' ? 659.25 : 783.99, nw); osc.frequency.exponentialRampToValueAtTime(type === 'water' ? 987.77 : 1046.50, nw + .08);
+						g.gain.setValueAtTime(.05, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .08);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .09);
 					} else if (type === 'sunAttach') {
-						osc.type = 'triangle'; osc.frequency.setValueAtTime(520, nw); osc.frequency.linearRampToValueAtTime(880, nw + .12);
-						g.gain.setValueAtTime(.07, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .14);
-						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .15);
+						// Ethereal soul flame bonding resonance
+						osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, nw); osc.frequency.linearRampToValueAtTime(880, nw + .14);
+						g.gain.setValueAtTime(.06, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .15);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .16);
 					} else if (type === 'sprinklerStart') {
-						osc.type = 'sine'; osc.frequency.setValueAtTime(440, nw); osc.frequency.linearRampToValueAtTime(780, nw + .15);
-						g.gain.setValueAtTime(.08, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .2);
-						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .22);
+						// Cleansing mist shower activation
+						osc.type = 'sine'; osc.frequency.setValueAtTime(440, nw); osc.frequency.linearRampToValueAtTime(880, nw + .18);
+						g.gain.setValueAtTime(.07, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .22);
+						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .24);
 					} else if (type === 'harvest') {
+						// Harmonious celestial bloom chord
 						const notes = [523.25, 659.25, 783.99, 1046.50];
 						notes.forEach((freq, idx) => {
 							const o = this.actx.createOscillator(), gn = this.actx.createGain();
-							o.type = 'sine'; o.frequency.setValueAtTime(freq, nw + idx * 0.05);
-							gn.gain.setValueAtTime(.07, nw + idx * 0.05); gn.gain.exponentialRampToValueAtTime(.0001, nw + idx * 0.05 + .3);
-							o.connect(gn); gn.connect(this.actx.destination); o.start(nw + idx * 0.05); o.stop(nw + idx * 0.05 + .32);
+							o.type = 'sine'; o.frequency.setValueAtTime(freq, nw + idx * 0.06);
+							gn.gain.setValueAtTime(.06, nw + idx * 0.06); gn.gain.exponentialRampToValueAtTime(.0001, nw + idx * 0.06 + .35);
+							o.connect(gn); gn.connect(this.actx.destination); o.start(nw + idx * 0.06); o.stop(nw + idx * 0.06 + .38);
 						});
 					} else if (type === 'graze') {
-						osc.type = 'sine'; osc.frequency.setValueAtTime(880, nw); osc.frequency.exponentialRampToValueAtTime(1320, nw + .05);
-						g.gain.setValueAtTime(.04, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .05);
+						// Gentle starlight graze sparkle
+						osc.type = 'sine'; osc.frequency.setValueAtTime(987.77, nw); osc.frequency.exponentialRampToValueAtTime(1318.51, nw + .05);
+						g.gain.setValueAtTime(.03, nw); g.gain.exponentialRampToValueAtTime(.001, nw + .05);
 						osc.connect(g); g.connect(this.actx.destination); osc.start(nw); osc.stop(nw + .06);
 					}
 				} catch (e) { }
@@ -699,10 +876,10 @@
 				try {
 					const idx = Math.floor((1 - Math.min(Math.max(y / (this.h || 1), 0), 1)) * this.scl.length);
 					const osc = this.actx.createOscillator(), g = this.actx.createGain();
-					osc.type = 'triangle';
+					osc.type = 'sine';// Pure soothing sine tone for spirit wisp gliding
 					osc.frequency.setValueAtTime(this.scl[Math.min(idx, this.scl.length - 1)], nw);
-					const dur = Math.max(.2, .5 - spd * .015), vol = Math.min(.08, .02 + spd * .005);
-					g.gain.setValueAtTime(.001, nw); g.gain.linearRampToValueAtTime(vol, nw + .012);
+					const dur = Math.max(.22, .52 - spd * .015), vol = Math.min(.07, .02 + spd * .004);
+					g.gain.setValueAtTime(.001, nw); g.gain.linearRampToValueAtTime(vol, nw + .015);
 					g.gain.exponentialRampToValueAtTime(.0001, nw + dur);
 					osc.connect(g); g.connect(this.actx.destination);
 					osc.start(nw); osc.stop(nw + dur + .02);
@@ -726,15 +903,24 @@
 			},
 			updateHud(force) {
 				if (this.elCr && (force || this._lCr !== this.harvestCount)) {
+					if (!force && this._lCr !== -1 && this._lCr !== this.harvestCount) {
+						this.triggerFlash(this.elPillCr, 'flash-green');
+					}
 					this._lCr = this.harvestCount;
 					this.elCr.textContent = `🧺 ${this.harvestCount}`;
 				}
 				const wtStr = this.sprinklerTimer > 0 ? '🚿 SPRAY!' : `💧 ${this.waterCollected}/${this.waterThreshold}`;
 				if (this.elWt && (force || this._lWt !== wtStr)) {
+					if (!force && this._lWt !== '' && this._lWt !== wtStr) {
+						this.triggerFlash(this.elPillWt, 'flash-blue');
+					}
 					this._lWt = wtStr;
 					this.elWt.textContent = wtStr;
 				}
 				if (this.elHp && (force || this._lHp !== this.hp)) {
+					if (!force && this._lHp !== -1 && this._lHp !== this.hp) {
+						this.triggerFlash(this.elPillHp, 'flash-red');
+					}
 					this._lHp = this.hp;
 					this.elHp.textContent = '❤'.repeat(Math.max(0, this.hp)) + '🖤'.repeat(Math.max(0, this.maxHp - this.hp));
 				}
@@ -779,14 +965,17 @@
 			takeDamage() {
 				if (!this.gameStarted || this.iFrames > 0 || this.gameOver) return;
 				this.hp--;
-				this.iFrames = 60;
-				this.shake = 12;
-				this.flashRed = 1;
-				this.sfx('hit');
-				if (navigator.vibrate) navigator.vibrate([40, 30, 60]);
-				for (let i = 0; i < 12; i++)this.spawnP(this.head.x, this.head.y, 10, Math.random() * 6 - 3, Math.random() * 6 - 3, 0);
 				if (this.hp <= 0) {
 					this.gameOver = !0;
+					this.shake = 22;
+					this.flashRed = 1.4;
+					this.sfx('death');
+					this.isNewBest = this.timeElapsed > this.bestTime;
+					if (this.isNewBest) {
+						this.bestTime = this.timeElapsed;
+						try { localStorage.setItem('13kbsnake_best_time', this.bestTime.toString()); } catch (e) { }
+					}
+					for (let i = 0; i < 22; i++)this.spawnP(this.head.x, this.head.y, 14, Math.random() * 8 - 4, Math.random() * 8 - 4, 0);
 					this.hintExpanded = !1;
 					this.updateHintUI();
 					if (this.elPlay) {
@@ -794,7 +983,14 @@
 						this.elPlay.classList.remove('playing');
 						this.elPlay.title = 'Play Again';
 					}
+				} else {
+					this.iFrames = 60;
+					this.shake = 12;
+					this.flashRed = 1;
+					this.sfx('hit');
+					for (let i = 0; i < 12; i++)this.spawnP(this.head.x, this.head.y, 10, Math.random() * 6 - 3, Math.random() * 6 - 3, 0);
 				}
+				if (navigator.vibrate) navigator.vibrate([60, 40, 100]);
 				this.updateHud();
 			},
 			triggerHarvest(plot) {
@@ -919,9 +1115,9 @@
 					p.y = Math.round(this.getGroundY(p.x));
 					if (!p.ripe && this.gameStarted) {
 						if (p.water > 0 && p.sun > 0) {
-							p.growth += 0.075 * p.type.growRate;
-							p.water = Math.max(0, p.water - 0.03);
-							p.sun = Math.max(0, p.sun - 0.03);
+							p.growth += 0.028 * p.type.growRate;
+							p.water = Math.max(0, p.water - 0.012);
+							p.sun = Math.max(0, p.sun - 0.012);
 						}
 						if (p.growth >= 100) {
 							p.growth = 100;
@@ -1141,19 +1337,47 @@
 			},
 			drawGameOver() {
 				const c = this.ctx;
-				c.fillStyle = 'rgba(6,16,14,0.92)';
+				c.fillStyle = 'rgba(6,16,14,0.95)';
 				c.fillRect(0, 0, this.w, this.h);
 				c.textAlign = 'center';
-				c.font = 'bold 16px "Press Start 2P", monospace, monospace';
+
+				const curMins = (this.timeElapsed / 60).toFixed(1);
+				const bestMins = (this.bestTime / 60).toFixed(1);
+
+				// Top Header Banner
+				c.font = 'bold 10px "Press Start 2P", monospace, monospace';
+				c.fillStyle = '#64748b';
+				c.fillText('HARVEST OVER', this.w / 2, this.h / 2 - 62);
+
+				// Mocking Subtitle
+				c.font = 'bold 9.5px monospace';
+				if (this.isNewBest && this.timeElapsed > 1) {
+					c.fillStyle = '#f8fafc';
+					c.fillText('★ NEW BEST RECORD! ★', this.w / 2, this.h / 2 - 42);
+				} else {
+					c.fillStyle = '#94a3b8';
+					c.fillText('WELL, YOU SURVIVED FOR ONLY:', this.w / 2, this.h / 2 - 42);
+				}
+
+				// MAIN HERO EMPHASIZED SURVIVAL TIME SCORE
+				c.font = 'bold 24px "Press Start 2P", monospace, monospace';
 				c.fillStyle = '#ffffff';
-				c.fillText('HARVEST DAY OVER', this.w / 2, this.h / 2 - 45);
-				c.font = '12px monospace';
-				c.fillStyle = '#e2e8f0';
-				c.fillText(`CROPS HARVESTED: 🧺 ${this.harvestCount}`, this.w / 2, this.h / 2 - 10);
-				c.fillText(`GARDEN SURVIVED: ${this.timeElapsed.toFixed(1)}s`, this.w / 2, this.h / 2 + 15);
-				c.font = 'bold 10px monospace';
-				c.fillStyle = '#94a3b8';
-				c.fillText('TAP ▶ IN CONTROLS OR SPACE TO RESTART', this.w / 2, this.h / 2 + 60);
+				c.shadowColor = 'rgba(255,255,255,0.6)';
+				c.shadowBlur = 10;
+				c.fillText(`${curMins} MINS`, this.w / 2, this.h / 2 - 12);
+				c.shadowBlur = 0;
+
+				// Best Time & Secondary Harvest Count Stats
+				c.font = 'bold 10.5px monospace';
+				c.fillStyle = '#cbd5e1';
+				c.fillText(`BEST RECORD: ⏱ ${bestMins} MINS`, this.w / 2, this.h / 2 + 18);
+				c.fillText(`CROPS HARVESTED: 🧺 ${this.harvestCount}`, this.w / 2, this.h / 2 + 36);
+
+				// Flashing Action Prompt
+				const blink = Math.floor(Date.now() / 400) % 2 === 0;
+				c.font = 'bold 9px "Press Start 2P", monospace, monospace';
+				c.fillStyle = blink ? '#ffffff' : '#64748b';
+				c.fillText('TAP TO RETRY', this.w / 2, this.h / 2 + 66);
 			},
 			draw() {
 				const c = this.ctx, spd = this.lp ? this.lp.spd : 0, tmp = Math.min(1, spd / 18);
@@ -1367,6 +1591,7 @@
 		if (canvasEl) {
 			canvasEl.addEventListener('pointerdown', e => {
 				e.preventDefault();
+				reqFs();
 				if (S.gameOver) { S.reset(); S.startGame(); }
 			}, { passive: !1 });
 		}
@@ -1402,6 +1627,7 @@
 			btnPlay.onclick = e => {
 				e.stopPropagation();
 				S.iAud();
+				reqFs();
 				if (!S.gameStarted || S.gameOver) {
 					S.reset();
 					S.startGame();
@@ -1414,6 +1640,15 @@
 			e.stopPropagation(); S.iAud(); S.snd = !S.snd;
 			e.target.textContent = S.snd ? '🔊' : '🔇';
 		};
+		window.addEventListener('pointerdown', e => {
+			if (S.gameOver) {
+				e.preventDefault();
+				S.iAud();
+				reqFs();
+				S.reset();
+				S.startGame();
+			}
+		}, { capture: true, passive: false });
 		['pointerdown', 'touchstart', 'mousedown', 'keydown'].forEach(ev => window.addEventListener(ev, () => S.iAud(), { once: !0, passive: !0 }));
 		window.addEventListener('DOMContentLoaded', () => { const c = document.getElementById('snake-canvas'); if (c) { S.init(c); S.start(); } });
 		if ('serviceWorker' in navigator) {
@@ -1421,7 +1656,104 @@
 				navigator.serviceWorker.register('./sw.js').catch(() => {});
 			});
 		}
+
+		// Fullscreen & PWA Install Management
+		function reqFs() {
+			try {
+				if (document.fullscreenElement) return;
+				const el = document.documentElement;
+				if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+				else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen().catch(() => {});
+			} catch (e) {}
+		}
+
+		let deferredInstallPrompt = null;
+		const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+		const isIos = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+		const btnInstall = document.getElementById('btn-install');
+		const pwaModal = document.getElementById('pwa-modal');
+		const pwaModalClose = document.getElementById('pwa-modal-close');
+		const pwaBtnPrompt = document.getElementById('pwa-btn-prompt');
+		const pwaAndroidContent = document.getElementById('pwa-android-content');
+		const pwaIosContent = document.getElementById('pwa-ios-content');
+
+		function openInstallModal() {
+			if (isStandalone || !pwaModal) return;
+			if (isIos) {
+				if (pwaAndroidContent) pwaAndroidContent.style.display = 'none';
+				if (pwaIosContent) pwaIosContent.style.display = 'block';
+			} else {
+				if (pwaAndroidContent) pwaAndroidContent.style.display = 'block';
+				if (pwaIosContent) pwaIosContent.style.display = 'none';
+			}
+			pwaModal.classList.add('show');
+		}
+
+		function closeInstallModal() {
+			if (pwaModal) pwaModal.classList.remove('show');
+		}
+
+		if (pwaModalClose) pwaModalClose.onclick = e => { e.stopPropagation(); closeInstallModal(); };
+		if (pwaModal) pwaModal.onclick = e => { if (e.target === pwaModal) closeInstallModal(); };
+
+		if (!isStandalone) {
+			if (btnInstall) {
+				btnInstall.classList.add('visible');
+				btnInstall.onclick = e => { e.stopPropagation(); openInstallModal(); };
+			}
+		}
+
+		window.addEventListener('beforeinstallprompt', e => {
+			e.preventDefault();
+			deferredInstallPrompt = e;
+			if (btnInstall && !isStandalone) btnInstall.classList.add('visible');
+		});
+
+		if (pwaBtnPrompt) {
+			pwaBtnPrompt.onclick = async e => {
+				e.stopPropagation();
+				if (deferredInstallPrompt) {
+					deferredInstallPrompt.prompt();
+					const { outcome } = await deferredInstallPrompt.userChoice;
+					if (outcome === 'accepted') {
+						if (btnInstall) btnInstall.classList.remove('visible');
+					}
+					deferredInstallPrompt = null;
+					closeInstallModal();
+				} else {
+					closeInstallModal();
+					reqFs();
+				}
+			};
+		}
 	</script>
+	<!-- PWA Install Modal -->
+	<div id="pwa-modal" class="pwa-modal-overlay">
+		<div class="pwa-modal-card">
+			<button id="pwa-modal-close" class="pwa-modal-close" title="Close">✕</button>
+			<div class="pwa-modal-title">PLAY FULLSCREEN</div>
+			<div id="pwa-android-content">
+				<div class="pwa-modal-desc">Install this web game to your device for immersive fullscreen mode & offline play!</div>
+				<button id="pwa-btn-prompt" class="pwa-install-btn">📲 INSTALL APP</button>
+			</div>
+			<div id="pwa-ios-content" style="display: none;">
+				<div class="pwa-modal-desc">
+					<div class="pwa-step-item">
+						<span class="pwa-step-num">1</span>
+						<span>Tap the <strong>Share</strong> icon (⎋ / ⇪) in Safari.</span>
+					</div>
+					<div class="pwa-step-item">
+						<span class="pwa-step-num">2</span>
+						<span>Scroll & select <strong>"Add to Home Screen"</strong> (⊞).</span>
+					</div>
+					<div class="pwa-step-item">
+						<span class="pwa-step-num">3</span>
+						<span>Open from Home Screen for true fullscreen!</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 
 </html>
